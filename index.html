@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五柳先生傳精準九句挑戰</title>
+    <style>
+        :root {
+            --primary-color: #5c4033;
+            --bg-color: #f4efe6;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", "Noto Serif TC", serif;
+            background-color: var(--bg-color);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid var(--primary-color);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.6em;
+        }
+
+        .desc {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+            background: #eae3d2;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        /* 登入畫面 */
+        #login-section {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        input[type="text"] {
+            padding: 12px 15px;
+            font-size: 1.1em;
+            border: 2px solid #bbb;
+            border-radius: 6px;
+            width: 80%;
+            max-width: 28px0px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.1em;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #412d24;
+        }
+
+        /* 遊戲畫面 */
+        #game-section {
+            display: none;
+        }
+
+        .welcome-msg {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .rules-box {
+            background: #f0ebe1;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            line-height: 1.5;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        /* 排序列表 */
+        .sentence-item {
+            display: flex;
+            align-items: center;
+            background: #fffcf7;
+            border: 1px solid #dcd6cd;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .sentence-item:active {
+            cursor: grabbing;
+            background: #f5eedf;
+        }
+
+        .index-badge {
+            background: var(--primary-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 0.85em;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .sentence-text {
+            font-size: 1.15em;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .fill-blank {
+            width: 50px;
+            text-align: center;
+            font-size: 1em;
+            border: none;
+            border-bottom: 2px solid #a68c70;
+            background: #fffdf9;
+            padding: 2px 0;
+            margin: 0 4px;
+            color: #cc0000;
+            font-weight: bold;
+        }
+
+        .fill-blank:focus {
+            outline: none;
+            border-bottom-color: #cc0000;
+            background: #fff9ed;
+        }
+
+        #submit-btn {
+            display: block;
+            width: 100%;
+            margin-top: 25px;
+            padding: 15px;
+            font-size: 1.2em;
+        }
+
+        /* 全螢幕鎖定成績層 */
+        #score-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f4efe6; /* 完全阻絕背景 */
+            z-index: 99999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .final-score-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            border: 6px double var(--primary-color);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 450px;
+            width: 85%;
+        }
+
+        .final-name {
+            font-size: 1.5em;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .score-title {
+            font-size: 1.8em;
+            letter-spacing: 1px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .score-num {
+            font-size: 7.5em;
+            font-weight: 900;
+            color: #cc0000;
+            margin: 10px 0;
+            font-family: 'Arial Black', sans-serif;
+            text-shadow: 2px 2px 0px #eee;
+        }
+
+        .comment {
+            font-size: 1.3em;
+            color: #444;
+            font-weight: bold;
+            border-top: 2px dashed #ddd;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-container">
+    <h1>《五柳先生傳》精準 9 句挑戰賽</h1>
+    <div class="desc">範圍：從「環堵蕭然」至「以此自終」</div>
+
+    <!-- 登入區塊 -->
+    <div id="login-section">
+        <h2>請輸入姓名開始測驗</h2>
+        <input type="text" id="username" placeholder="輸入您的姓名" maxlength="10" autocomplete="off">
+        <br>
+        <button onclick="startGame()">開始挑戰</button>
+    </div>
+
+    <!-- 遊戲主區塊 -->
+    <div id="game-section">
+        <div class="welcome-msg" id="welcome-text">挑戰學生：</div>
+        <div class="rules-box">
+            <b>💡 挑戰規則：</b><br>
+            1. <b>拖曳排序</b>：用滑鼠按住文句，上下移動排成正確的課文順序。<br>
+            2. <b>挖空填充</b>：在空格中填入正確的國字。<br>
+            3. <b>計分標準</b>：總共 9 句，每句 11 分。<b>句子的順序放錯，該句直接 0 分</b>；若順序正確但填充字寫錯，<b>錯一字扣 2 分</b>。<br>
+            ⚠️ <b>注意：本遊戲只能玩一次，送出後答案即鎖定無法重來！</b>
+        </div>
+        
+        <div id="drag-list"></div>
+
+        <button id="submit-btn" onclick="submitAnswers()">我已檢查完畢，提交答案</button>
+    </div>
+</div>
+
+<!-- 終極鎖定成績看板 -->
+<div id="score-overlay">
+    <div class="final-score-box">
+        <div class="final-name" id="res-name">學生：</div>
+        <div class="score-title">測驗最終成績</div>
+        <div class="score-num" id="res-score">0</div>
+        <div class="comment" id="res-comment">評語</div>
+    </div>
+</div>
+
+<script>
+    // 嚴格依照標點符號切分的 9 句文本與挖空
+    const correctData = [
+        { id: 1, text: ["環堵", "蕭", "然，"] },
+        { id: 2, text: ["不", "蔽", "風日；"] },
+        { id: 3, text: ["短褐", "穿結", "，"] },
+        { id: 4, text: ["簞瓢", "屢", "空，"] },
+        { id: 5, text: ["", "晏", "如也。"] },
+        { id: 6, text: ["常著文章", "自娛", "，"] },
+        { id: 7, text: ["頗", "示己", "志；"] },
+        { id: 8, text: ["忘懷", "得失", "，"] },
+        { id: 9, text: ["以此自", "終", "。"] }
+    ];
+
+    let shuffledOrder = [];
+
+    // 檢查是否玩過
+    window.onload = function() {
+        if (localStorage.getItem("willows_9_played") === "true") {
+            showFinalScore(
+                localStorage.getItem("willows_9_name"),
+                localStorage.getItem("willows_9_score")
+            );
+        }
+    };
+
+    function startGame() {
+        const nameInput = document.getElementById("username").value.trim();
+        if (!nameInput) {
+            alert("請先輸入姓名！");
+            return;
+        }
+
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("game-section").style.display = "block";
+        document.getElementById("welcome-text").innerText = `挑戰學生：${nameInput}`;
+
+        // 隨機打亂
+        shuffledOrder = [...correctData].sort(() => Math.random() - 0.5);
+        renderGameList();
+    }
+
+    function renderGameList() {
+        const listContainer = document.getElementById("drag-list");
+        listContainer.innerHTML = "";
+
+        shuffledOrder.forEach((item, index) => {
+            const div = document.createElement("div");
+            div.className = "sentence-item";
+            div.draggable = true;
+            div.dataset.id = item.id;
+            
+            div.addEventListener("dragstart", dragStart);
+            div.addEventListener("dragover", dragOver);
+            div.addEventListener("drop", drop);
+
+            const badge = document.createElement("div");
+            badge.className = "index-badge";
+            badge.innerText = index + 1;
+
+            const textContainer = document.createElement("div");
+            textContainer.className = "sentence-text";
+            
+            const part1 = document.createTextNode(item.text[0]);
+            const input = document.createElement("input");
+            input.type = "text";
+            input.className = "fill-blank";
+            input.maxLength = item.text[1].length;
+            input.dataset.correct = item.text[1];
+            input.placeholder = `${item.text[1].length}字`;
+            const part2 = document.createTextNode(item.text[2]);
+
+            textContainer.appendChild(part1);
+            textContainer.appendChild(input);
+            textContainer.appendChild(part2);
+
+            div.appendChild(badge);
+            div.appendChild(textContainer);
+            listContainer.appendChild(div);
+        });
+    }
+
+    // 拖曳邏輯
+    let dragSource = null;
+
+    function dragStart(e) {
+        dragSource = this;
+        e.dataTransfer.effectAllowed = "move";
+    }
+
+    function dragOver(e) {
+        e.preventDefault();
+    }
+
+    function drop(e) {
+        e.preventDefault();
+        if (this === dragSource) return;
+
+        const list = document.getElementById("drag-list");
+        const items = Array.from(list.children);
+        const sIdx = items.indexOf(dragSource);
+        const tIdx = items.indexOf(this);
+
+        if (sIdx < tIdx) {
+            list.insertBefore(dragSource, this.nextSibling);
+        } else {
+            list.insertBefore(dragSource, this);
+        }
+
+        // 更新序號
+        Array.from(list.children).forEach((el, idx) => {
+            el.querySelector(".index-badge").innerText = idx + 1;
+        });
+    }
+
+    // 計算成績
+    function submitAnswers() {
+        if (!confirm("確定要提交答案嗎？送出後將永久鎖定成績且無法更改！")) return;
+
+        const currentItems = Array.from(document.getElementById("drag-list").children);
+        const name = document.getElementById("username").value.trim();
+        
+        let finalScore = 1; // 基礎分 1 分，加上 9 句 * 11 分 = 100 滿分
+
+        currentItems.forEach((item, index) => {
+            const correctPosId = index + 1; 
+            const itemRealId = parseInt(item.dataset.id);
+            const inputWidget = item.querySelector(".fill-blank");
+            const studentInput = inputWidget.value.trim();
+            const correctString = inputWidget.dataset.correct;
+
+            let sentenceScore = 11;
+
+            // 1. 如果句子位置排錯，該句直接 0 分
+            if (itemRealId !== correctPosId) {
+                sentenceScore = 0;
+            } else {
+                // 2. 位置正確，檢查填充錯字（錯一字扣 2 分）
+                let wrongCount = 0;
+                for (let i = 0; i < correctString.length; i++) {
+                    if (studentInput[i] !== correctString[i]) {
+                        wrongCount++;
+                    }
+                }
+                sentenceScore -= (wrongCount * 2);
+                if (sentenceScore < 0) sentenceScore = 0;
+            }
+
+            finalScore += sentenceScore;
+        });
+
+        if (finalScore > 100) finalScore = 100;
+
+        // 紀錄到瀏覽器快取，防止重整網頁重玩
+        localStorage.setItem("willows_9_played", "true");
+        localStorage.setItem("willows_9_name", name);
+        localStorage.setItem("willows_9_score", finalScore);
+
+        showFinalScore(name, finalScore);
+    }
+
+    // 滿版強烈顯示，無法抹滅與關閉
+    function showFinalScore(name, score) {
+        document.getElementById("res-name").innerText = `學生姓名：${name}`;
+        document.getElementById("res-score").innerText = score;
+
+        let comment = "加油！再多讀幾次課文，你一定可以的！";
+        if (score === 100) {
+            comment = "太震撼了！完璧歸趙，滿分通關！💯";
+        } else if (score >= 85) {
+            comment = "非常厲害！對文句順序和字詞很熟練！👍";
+        } else if (score >= 60) {
+            comment = "及格了！稍微注意一下錯字或順序就更棒了！";
+        }
+
+        document.getElementById("res-comment").innerText = comment;
+        document.getElementById("score-overlay").style.display = "flex";
+    }
+</script>
+
+</body>
+</html>
